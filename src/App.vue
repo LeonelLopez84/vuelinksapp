@@ -4,7 +4,7 @@
     <h1>Vue and Firebase</h1>
     <div class="card">
       <div class="card-header">
-        <h3>Add A link</h3>
+        <h3>Add A link</h3> 
       </div>
       <div class="card-body">
         <form v-on:submit.prevent="addLink" class="form-inline">
