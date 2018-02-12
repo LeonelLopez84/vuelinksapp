@@ -12,6 +12,7 @@
   "dependencies": {
     "firebase": "^4.8.2",
     "jquery": "^3.2.1",
+    "randomstring": "^1.1.5",
     "toaster": "^0.1.2",
     "toastr": "^2.1.4",
     "vue": "^2.5.2",
