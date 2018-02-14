@@ -3,16 +3,17 @@
      <h2>Tareas</h2> 
         <ul class="list-group task">
           <li v-for="task in tasks" class="list-group-item" :class="{editing: task.editing, completed: !task.pending }">
-            <button class="btn btn-default" v-on:click="setPending(task)" ><span class="fa" :class="task.pending ? 'fa-square' : 'fa-check-square'"></span></button>
-
+            <button class="btn btn-default" v-on:click="setPending(task)" >
+              <app-icon :img="task.pending ? 'square' : 'check-square'"></app-icon>
+                </button>
             <template v-if="!task.editing" >
             <span class="description">{{task.name}}</span>
             <div class="pull-right">
-              <button class="btn btn-info" v-on:click="setEditing(task,1)">
-                <span class="fa fa-edit"></span>
+              <button class="btn btn-info" v-on:click="toggleEditing(task)">
+               <app-icon img="pencil"></app-icon>
               </button>
                <button class="btn btn-danger" v-on:click.prevent="deleteTask(task)">
-                <span class="fa fa-trash"></span>
+                <app-icon img="trash"></app-icon>
               </button>
             </div>
             </template>
@@ -20,11 +21,11 @@
           <template v-else >
             <input v-model="task.name" type="text">
             <div class="pull-right">
-              <button class="btn btn-default" v-on:click="setEditing(task,0)">
-                <span class="fa fa-check"></span>
+              <button class="btn btn-default" v-on:click="toggleEditing(task)">
+                 <app-icon img="check"></app-icon>
               </button>
                <button class="btn btn-default">
-                <span class="fa fa-times" v-on:click="cancelEditing(task)"></span>
+                  <app-icon img="times"></app-icon>
               </button>
             </div>
           </template>
@@ -44,10 +45,21 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import Firebase from '../firebase'
 
 let db = Firebase.database()
 let tasksRef = db.ref('tasks')
+
+Vue.component('app-icon', {
+  template: '<span :class="cssClasses"></span>',
+  props: ['img'],
+  computed: {
+    cssClasses: function () {
+      return 'fa fa-' + this.img
+    }
+  }
+})
 
 export default {
   name: 'Crud',
@@ -55,20 +67,17 @@ export default {
     tasks: tasksRef
   },
   methods: {
-    setPending: function (task){
+    setPending: function (task) {
       var pending = task.pending ? 0 : 1
       tasksRef.child(task['.key']).child('pending').set(pending)
     },
-    setEditing: function (task, editing) {
-      if (!editing) {
-        tasksRef.child(task['.key']).child('editing').set(editing)
-        tasksRef.child(task['.key']).child('name').set(task.name)
-      } else {
-        tasksRef.child(task['.key']).child('editing').set(editing)
-      }
+    toggleEditing: function (task) {
+      var editing = task.editing ? 0 : 1
+      tasksRef.child(task['.key']).child('editing').set(editing)
+      tasksRef.child(task['.key']).child('name').set(task.name)
     },
     cancelEditing: function (task) {
-       tasksRef.child(task['.key']).child('editing').set(0)
+      tasksRef.child(task['.key']).child('editing').set(0)
     },
     addTask: function () {
       this.newTask.editing = false
