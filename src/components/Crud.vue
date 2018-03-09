@@ -7,7 +7,7 @@
               <app-icon :img="task.pending ? 'square' : 'check-square'"></app-icon>
                 </button>
             <template v-if="!task.editing" >
-            <span class="description">{{task.name}}</span>
+            <span class="description">{{task.name}} {{getUser(task.idUser).nombre}}</span>
             <div class="pull-right">
               <button class="btn btn-info" v-on:click="toggleEditing(task)">
                <app-icon img="pencil"></app-icon>
@@ -50,6 +50,7 @@ import Firebase from '../firebase'
 
 let db = Firebase.database()
 let tasksRef = db.ref('tasks')
+const usersRef = db.ref('users')
 
 Vue.component('app-icon', {
   template: '<span :class="cssClasses"></span>',
@@ -82,11 +83,22 @@ export default {
     addTask: function () {
       this.newTask.editing = false
       this.newTask.pending = true
+      this.newTask.idUser = 1
       tasksRef.push(this.newTask)
       this.newTask.name = ''
     },
     deleteTask: function (task) {
       tasksRef.child(task['.key']).remove()
+    },
+    getUser: function (key) {
+      var user = ''
+      usersRef.child(key).on('value', snap1 => {
+        let userRef = usersRef.child(snap1.key)
+        userRef.once('value', snap2 => {
+          user = snap2.val()
+        })
+      })
+      return user
     }
   },
   data () {
