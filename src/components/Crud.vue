@@ -7,7 +7,7 @@
               <app-icon :img="task.pending ? 'square' : 'check-square'"></app-icon>
                 </button>
             <template v-if="!task.editing" >
-            <span class="description">{{task.name}} {{getUser(task.idUser).nombre}}</span>
+            <span class="description">{{task.name}} {{getUser(task.idUser)}}</span>
             <div class="pull-right">
               <button class="btn btn-info" v-on:click="toggleEditing(task)">
                <app-icon img="pencil"></app-icon>
@@ -28,7 +28,7 @@
                   <app-icon img="times"></app-icon>
               </button>
             </div>
-          </template>
+          </template> 
           </li>
         </ul>
         <hr>
@@ -39,6 +39,7 @@
   </div>
    <div class="form-group">
   <button type="submit" class="btn btn-primary mb-2">Crear Nueva Tarea</button>
+  <Item></Item>
 </div>
 </form>
 </div>
@@ -47,6 +48,7 @@
 <script>
 import Vue from 'vue'
 import Firebase from '../firebase'
+import Item from './Item'
 
 let db = Firebase.database()
 let tasksRef = db.ref('tasks')
@@ -64,6 +66,9 @@ Vue.component('app-icon', {
 
 export default {
   name: 'Crud',
+  components: {
+    Item
+  },
   firebase: {
     tasks: tasksRef
   },
@@ -92,7 +97,7 @@ export default {
     },
     getUser: function (key) {
       var user = ''
-      usersRef.child(key).on('value', snap1 => {
+      usersRef.child(key).once('value', snap1 => {
         let userRef = usersRef.child(snap1.key)
         userRef.once('value', snap2 => {
           user = snap2.val()
